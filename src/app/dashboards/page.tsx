@@ -26,6 +26,8 @@ export default function DashboardPage() {
   const [newKeyName, setNewKeyName] = useState('');
   const [monthlyLimit, setMonthlyLimit] = useState('1000');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingKey, setEditingKey] = useState<{ id: string; name: string } | null>(null);
   const [visibleKeys, setVisibleKeys] = useState<Record<string, boolean>>({});
 
   // Mock data - Replace with actual API calls
@@ -86,6 +88,23 @@ export default function DashboardPage() {
     const prefix = 'tvly-';
     const rest = key.slice(prefix.length);
     return prefix + '*'.repeat(rest.length);
+  };
+
+  const handleEditKey = (apiKey: ApiKey) => {
+    setEditingKey({ id: apiKey.id, name: apiKey.name });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (editingKey) {
+      setApiKeys(keys => keys.map(key => 
+        key.id === editingKey.id 
+          ? { ...key, name: editingKey.name }
+          : key
+      ));
+      setIsEditDialogOpen(false);
+      setEditingKey(null);
+    }
   };
 
   return (
@@ -207,7 +226,10 @@ export default function DashboardPage() {
                     <button className="p-2 hover:bg-gray-50 rounded-md text-gray-400 hover:text-gray-500">
                       <CopyIcon className="w-4 h-4" />
                     </button>
-                    <button className="p-2 hover:bg-gray-50 rounded-md text-gray-400 hover:text-gray-500">
+                    <button 
+                      className="p-2 hover:bg-gray-50 rounded-md text-gray-400 hover:text-gray-500"
+                      onClick={() => handleEditKey(apiKey)}
+                    >
                       <EditIcon className="w-4 h-4" />
                     </button>
                     <button 
@@ -223,6 +245,45 @@ export default function DashboardPage() {
           </TableBody>
         </Table>
       </div>
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px] bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold text-gray-900">Edit API Key</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            <div className="space-y-2">
+              <Input
+                value={editingKey?.name || ''}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                  setEditingKey(prev => prev ? { ...prev, name: e.target.value } : null)
+                }
+                placeholder="my-cool-api-key"
+                className="w-full bg-gray-900/5 border-0 text-gray-900 placeholder:text-gray-500 focus-visible:ring-1 focus-visible:ring-gray-300"
+              />
+            </div>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsEditDialogOpen(false);
+                  setEditingKey(null);
+                }}
+                className="bg-transparent hover:bg-gray-50 border-gray-200 text-gray-600"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSaveEdit}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                Save
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
