@@ -26,6 +26,7 @@ export default function DashboardPage() {
   const [newKeyName, setNewKeyName] = useState('');
   const [monthlyLimit, setMonthlyLimit] = useState('1000');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [visibleKeys, setVisibleKeys] = useState<Record<string, boolean>>({});
 
   // Mock data - Replace with actual API calls
   useEffect(() => {
@@ -72,6 +73,13 @@ export default function DashboardPage() {
   const handleDeleteKey = async (id: string) => {
     // TODO: Implement actual API call
     setApiKeys(apiKeys.filter((key) => key.id !== id));
+  };
+
+  const toggleKeyVisibility = (id: string) => {
+    setVisibleKeys(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
   };
 
   return (
@@ -178,11 +186,16 @@ export default function DashboardPage() {
                 <TableCell className="font-medium text-gray-900">{apiKey.name}</TableCell>
                 <TableCell className="text-gray-500">{apiKey.usage}</TableCell>
                 <TableCell>
-                  <code className="bg-gray-50 px-2 py-1 rounded text-gray-500">{apiKey.key}</code>
+                  <code className="bg-gray-50 px-2 py-1 rounded text-gray-500">
+                    {visibleKeys[apiKey.id] ? apiKey.key : apiKey.key.replace(/[^-]/g, '*')}
+                  </code>
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
-                    <button className="p-2 hover:bg-gray-50 rounded-md text-gray-400 hover:text-gray-500">
+                    <button 
+                      className={`p-2 hover:bg-gray-50 rounded-md ${visibleKeys[apiKey.id] ? 'text-blue-600' : 'text-gray-400 hover:text-gray-500'}`}
+                      onClick={() => toggleKeyVisibility(apiKey.id)}
+                    >
                       <EyeIcon className="w-4 h-4" />
                     </button>
                     <button className="p-2 hover:bg-gray-50 rounded-md text-gray-400 hover:text-gray-500">
