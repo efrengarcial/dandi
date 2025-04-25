@@ -34,14 +34,14 @@ export default function DashboardPage() {
       {
         id: '1',
         name: 'default',
-        key: 'tvly-********************************',
+        key: 'tvly-************sssss******************',
         createdAt: new Date().toISOString(),
         usage: 24,
       },
       {
         id: '2',
         name: 'tmp1',
-        key: 'tvly-********************************',
+        key: 'tvly-********sss********************',
         createdAt: new Date().toISOString(),
         usage: 0,
       },
@@ -80,6 +80,12 @@ export default function DashboardPage() {
       ...prev,
       [id]: !prev[id]
     }));
+  };
+
+  const maskApiKey = (key: string) => {
+    const prefix = 'tvly-';
+    const rest = key.slice(prefix.length);
+    return prefix + '*'.repeat(rest.length);
   };
 
   return (
@@ -187,7 +193,7 @@ export default function DashboardPage() {
                 <TableCell className="text-gray-500">{apiKey.usage}</TableCell>
                 <TableCell>
                   <code className="bg-gray-50 px-2 py-1 rounded text-gray-500">
-                    {visibleKeys[apiKey.id] ? apiKey.key : apiKey.key.replace(/[^-]/g, '*')}
+                    {visibleKeys[apiKey.id] ? apiKey.key : maskApiKey(apiKey.key)}
                   </code>
                 </TableCell>
                 <TableCell>
