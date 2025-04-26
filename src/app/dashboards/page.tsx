@@ -29,6 +29,7 @@ export default function DashboardPage() {
   const [editingKey, setEditingKey] = useState<{ id: string; name: string } | null>(null);
   const [visibleKeys, setVisibleKeys] = useState<Record<string, boolean>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchApiKeys();
@@ -140,6 +141,18 @@ export default function DashboardPage() {
     const prefix = 'dandi-';
     const rest = key.slice(prefix.length);
     return prefix + '*'.repeat(rest.length);
+  };
+
+  const handleCopyKey = (key: string, id: string) => {
+    navigator.clipboard.writeText(key).then(() => {
+      setCopiedKeyId(id);
+      // Reset the copied state after 2 seconds
+      setTimeout(() => {
+        setCopiedKeyId(null);
+      }, 2000);
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
   };
 
   return (
@@ -258,8 +271,15 @@ export default function DashboardPage() {
                     >
                       <EyeIcon className="w-4 h-4" />
                     </button>
-                    <button className="p-2 hover:bg-gray-50 rounded-md text-gray-400 hover:text-gray-500">
-                      <CopyIcon className="w-4 h-4" />
+                    <button 
+                      className={`p-2 hover:bg-gray-50 rounded-md ${copiedKeyId === apiKey.id ? 'text-green-600' : 'text-gray-400 hover:text-gray-500'}`}
+                      onClick={() => handleCopyKey(apiKey.key, apiKey.id)}
+                    >
+                      {copiedKeyId === apiKey.id ? (
+                        <CheckIcon className="w-4 h-4" />
+                      ) : (
+                        <CopyIcon className="w-4 h-4" />
+                      )}
                     </button>
                     <button 
                       className="p-2 hover:bg-gray-50 rounded-md text-gray-400 hover:text-gray-500"
@@ -344,5 +364,11 @@ function EditIcon(props: React.SVGProps<SVGSVGElement>) {
 function TrashIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+  );
+}
+
+function CheckIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polyline points="20 6 9 17 4 12"/></svg>
   );
 } 
