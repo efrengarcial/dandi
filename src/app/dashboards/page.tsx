@@ -12,13 +12,12 @@ import {
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { supabase } from '@/lib/supabase';
+import type { DbApiKey } from '@/lib/supabase';
+import { v4 as uuidv4 } from 'uuid';
 
-interface ApiKey {
-  id: string;
-  name: string;
-  key: string;
+interface ApiKey extends Omit<DbApiKey, 'created_at'> {
   createdAt: string;
-  usage?: number;
 }
 
 export default function DashboardPage() {
@@ -29,52 +28,105 @@ export default function DashboardPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingKey, setEditingKey] = useState<{ id: string; name: string } | null>(null);
   const [visibleKeys, setVisibleKeys] = useState<Record<string, boolean>>({});
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Mock data - Replace with actual API calls
   useEffect(() => {
-    setApiKeys([
-      {
-        id: '1',
-        name: 'default',
-        key: 'tvly-************sssss******************',
-        createdAt: new Date().toISOString(),
-        usage: 24,
-      },
-      {
-        id: '2',
-        name: 'tmp1',
-        key: 'tvly-********sss********************',
-        createdAt: new Date().toISOString(),
-        usage: 0,
-      },
-      {
-        id: '3',
-        name: 'tmp2',
-        key: 'tvly-********************************',
-        createdAt: new Date().toISOString(),
-        usage: 0,
-      },
-    ]);
+    fetchApiKeys();
   }, []);
 
+  const fetchApiKeys = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('api_keys')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      setApiKeys(
+        data.map(key => ({
+          ...key,
+          createdAt: key.created_at,
+        }))
+      );
+    } catch (error) {
+      console.error('Error fetching API keys:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleCreateKey = async () => {
-    // TODO: Implement actual API call
-    const newKey: ApiKey = {
-      id: Math.random().toString(),
-      name: newKeyName,
-      key: `tvly-********************************`,
-      createdAt: new Date().toISOString(),
-      usage: 0,
-    };
-    setApiKeys([...apiKeys, newKey]);
-    setNewKeyName('');
-    setMonthlyLimit('1000');
-    setIsCreateDialogOpen(false);
+    try {
+      const newKey: Omit<DbApiKey, 'id'> = {
+        name: newKeyName,
+        key: `dandi-${uuidv4()}`,
+        created_at: new Date().toISOString(),
+        usage: 0,
+      };
+
+      const { data, error } = await supabase
+        .from('api_keys')
+        .insert([newKey])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setApiKeys(keys => [{
+        ...data,
+        createdAt: data.created_at,
+      }, ...keys]);
+
+      setNewKeyName('');
+      setMonthlyLimit('1000');
+      setIsCreateDialogOpen(false);
+    } catch (error) {
+      console.error('Error creating API key:', error);
+    }
+  };
+
+  const handleEditKey = (apiKey: ApiKey) => {
+    setEditingKey({ id: apiKey.id, name: apiKey.name });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingKey) return;
+
+    try {
+      const { error } = await supabase
+        .from('api_keys')
+        .update({ name: editingKey.name })
+        .eq('id', editingKey.id);
+
+      if (error) throw error;
+
+      setApiKeys(keys => keys.map(key => 
+        key.id === editingKey.id 
+          ? { ...key, name: editingKey.name }
+          : key
+      ));
+      setIsEditDialogOpen(false);
+      setEditingKey(null);
+    } catch (error) {
+      console.error('Error updating API key:', error);
+    }
   };
 
   const handleDeleteKey = async (id: string) => {
-    // TODO: Implement actual API call
-    setApiKeys(apiKeys.filter((key) => key.id !== id));
+    try {
+      const { error } = await supabase
+        .from('api_keys')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setApiKeys(keys => keys.filter(key => key.id !== id));
+    } catch (error) {
+      console.error('Error deleting API key:', error);
+    }
   };
 
   const toggleKeyVisibility = (id: string) => {
@@ -85,26 +137,9 @@ export default function DashboardPage() {
   };
 
   const maskApiKey = (key: string) => {
-    const prefix = 'tvly-';
+    const prefix = 'dandi-';
     const rest = key.slice(prefix.length);
     return prefix + '*'.repeat(rest.length);
-  };
-
-  const handleEditKey = (apiKey: ApiKey) => {
-    setEditingKey({ id: apiKey.id, name: apiKey.name });
-    setIsEditDialogOpen(true);
-  };
-
-  const handleSaveEdit = () => {
-    if (editingKey) {
-      setApiKeys(keys => keys.map(key => 
-        key.id === editingKey.id 
-          ? { ...key, name: editingKey.name }
-          : key
-      ));
-      setIsEditDialogOpen(false);
-      setEditingKey(null);
-    }
   };
 
   return (
