@@ -88,8 +88,22 @@ export default function DashboardPage() {
       setNewKeyName('');
       setMonthlyLimit('1000');
       setIsCreateDialogOpen(false);
+      
+      // Show success notification
+      setNotificationState({
+        show: true,
+        message: 'API Key created successfully',
+        type: 'success'
+      });
     } catch (error) {
       console.error('Error creating API key:', error);
+      
+      // Show error notification
+      setNotificationState({
+        show: true,
+        message: 'Failed to create API Key',
+        type: 'error'
+      });
     }
   };
 
@@ -131,8 +145,22 @@ export default function DashboardPage() {
       if (error) throw error;
 
       setApiKeys(keys => keys.filter(key => key.id !== id));
+      
+      // Show success notification
+      setNotificationState({
+        show: true,
+        message: 'API Key deleted successfully',
+        type: 'success'
+      });
     } catch (error) {
       console.error('Error deleting API key:', error);
+      
+      // Show error notification
+      setNotificationState({
+        show: true,
+        message: 'Failed to delete API Key',
+        type: 'error'
+      });
     }
   };
 
