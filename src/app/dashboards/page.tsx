@@ -16,7 +16,7 @@ import { supabase } from '@/lib/supabase';
 import type { DbApiKey } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
 import { Notification } from '@/components/ui/notification';
-import { DashboardLayout } from '@/components/layout/dashboard-layout';
+import { DashboardLayout } from '@/app/dashboards/dashboard-layout';
 
 interface ApiKey extends Omit<DbApiKey, 'created_at'> {
   createdAt: string;
