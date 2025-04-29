@@ -6,7 +6,7 @@ const Table = ({ className, ...props }: HTMLAttributes<HTMLTableElement>) => (
 );
 
 const TableHeader = ({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>) => (
-  <thead className={cn('[&_tr]:border-b', className)} {...props} />
+  <thead className={cn('[&_tr]:border-b [&_tr]:border-gray-800', className)} {...props} />
 );
 
 const TableBody = ({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>) => (
@@ -14,11 +14,11 @@ const TableBody = ({ className, ...props }: HTMLAttributes<HTMLTableSectionEleme
 );
 
 const TableRow = ({ className, ...props }: HTMLAttributes<HTMLTableRowElement>) => (
-  <tr className={cn('border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted', className)} {...props} />
+  <tr className={cn('border-b border-gray-800 transition-colors hover:bg-gray-900/50 data-[state=selected]:bg-gray-800', className)} {...props} />
 );
 
 const TableHead = ({ className, ...props }: ThHTMLAttributes<HTMLTableCellElement>) => (
-  <th className={cn('h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0', className)} {...props} />
+  <th className={cn('h-12 px-4 text-left align-middle font-medium text-gray-400 [&:has([role=checkbox])]:pr-0', className)} {...props} />
 );
 
 const TableCell = ({ className, ...props }: TdHTMLAttributes<HTMLTableCellElement>) => (

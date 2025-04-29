@@ -37,10 +37,10 @@ export function Notification({
   }, [show, duration, onClose]);
 
   const typeStyles = {
-    success: "bg-green-100 border-green-200 text-green-800",
-    error: "bg-red-100 border-red-200 text-red-800",
-    info: "bg-blue-100 border-blue-200 text-blue-800",
-    warning: "bg-yellow-100 border-yellow-200 text-yellow-800"
+    success: "bg-green-900/60 border-green-700 text-green-300",
+    error: "bg-red-900/60 border-red-700 text-red-300",
+    info: "bg-blue-900/60 border-blue-700 text-blue-300",
+    warning: "bg-yellow-900/60 border-yellow-700 text-yellow-300"
   };
 
   if (!show) return null;
@@ -59,10 +59,10 @@ export function Notification({
         className={cn(
           "ml-4 hover:opacity-80",
           {
-            "text-green-600 hover:text-green-800": type === 'success',
-            "text-red-600 hover:text-red-800": type === 'error',
-            "text-blue-600 hover:text-blue-800": type === 'info',
-            "text-yellow-600 hover:text-yellow-800": type === 'warning',
+            "text-green-300 hover:text-green-100": type === 'success',
+            "text-red-300 hover:text-red-100": type === 'error',
+            "text-blue-300 hover:text-blue-100": type === 'info',
+            "text-yellow-300 hover:text-yellow-100": type === 'warning',
           }
         )}
       >

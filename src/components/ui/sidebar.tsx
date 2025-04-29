@@ -27,10 +27,10 @@ export function Sidebar({ className }: SidebarProps) {
   ];
 
   return (
-    <div className={cn("flex flex-col justify-between h-screen bg-white border-r border-gray-100 w-[200px] p-4", className)}>
+    <div className={cn("flex flex-col justify-between h-screen bg-black border-r border-gray-800 w-[200px] p-4", className)}>
       <div>
         <div className="py-4 px-3">
-          <h1 className="text-xl font-bold">Tavily AI</h1>
+          <h1 className="text-xl font-bold text-white">Tavily AI</h1>
         </div>
         
         <nav className="mt-6 space-y-1">
@@ -41,8 +41,8 @@ export function Sidebar({ className }: SidebarProps) {
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-md text-sm",
                 pathname === link.href
-                  ? "bg-gray-100 text-gray-900"
-                  : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                  ? "bg-gray-800 text-white"
+                  : "text-gray-400 hover:bg-gray-900 hover:text-white"
               )}
               target={link.external ? "_blank" : undefined}
               rel={link.external ? "noopener noreferrer" : undefined}
@@ -55,19 +55,15 @@ export function Sidebar({ className }: SidebarProps) {
         </nav>
       </div>
       
-      <div className="flex items-center p-3 border-t border-gray-100 mt-6">
+      <div className="flex items-center p-3 border-t border-gray-800 mt-6">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
-            <img 
-              src="https://ui-avatars.com/api/?name=Eden+Marco" 
-              alt="User avatar" 
-              className="w-full h-full object-cover"
-            />
+          <div className="w-8 h-8 rounded-full bg-gray-700 overflow-hidden flex items-center justify-center text-white text-xs font-medium">
+            N
           </div>
-          <span className="text-sm font-medium">Eden Marco</span>
+          <span className="text-sm font-medium text-white">Eden</span>
         </div>
         <button className="p-1 ml-auto">
-          <SettingsIcon className="w-5 h-5 text-gray-500" />
+          <SettingsIcon className="w-5 h-5 text-gray-400" />
         </button>
       </div>
     </div>
