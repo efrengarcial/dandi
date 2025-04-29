@@ -146,11 +146,11 @@ export default function DashboardPage() {
 
       setApiKeys(keys => keys.filter(key => key.id !== id));
       
-      // Show success notification
+      // Show deletion notification with red styling
       setNotificationState({
         show: true,
         message: 'API Key deleted successfully',
-        type: 'success'
+        type: 'error' // Using error type for red styling
       });
     } catch (error) {
       console.error('Error deleting API key:', error);
