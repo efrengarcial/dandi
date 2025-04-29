@@ -7,9 +7,11 @@ import { cn } from '@/lib/utils';
 
 interface SidebarProps {
   className?: string;
+  collapsed?: boolean;
+  onToggle?: () => void;
 }
 
-export function Sidebar({ className }: SidebarProps) {
+export function Sidebar({ className, collapsed = false, onToggle }: SidebarProps) {
   const pathname = usePathname();
   
   const links = [
@@ -27,10 +29,13 @@ export function Sidebar({ className }: SidebarProps) {
   ];
 
   return (
-    <div className={cn("flex flex-col justify-between h-screen bg-black border-r border-gray-800 w-[200px] p-4", className)}>
+    <div className={cn(
+      "flex flex-col justify-between h-screen bg-black border-r border-gray-800 w-[200px] p-4 shadow-lg",
+      className
+    )}>
       <div>
         <div className="py-4 px-3">
-          <h1 className="text-xl font-bold text-white">Tavily AI</h1>
+          <h1 className="text-xl font-bold text-white">Dandi AI</h1>
         </div>
         
         <nav className="mt-6 space-y-1">
