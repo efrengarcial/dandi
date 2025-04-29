@@ -16,6 +16,7 @@ import { supabase } from '@/lib/supabase';
 import type { DbApiKey } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
 import { Notification } from '@/components/ui/notification';
+import { DashboardLayout } from '@/components/layout/dashboard-layout';
 
 interface ApiKey extends Omit<DbApiKey, 'created_at'> {
   createdAt: string;
@@ -205,199 +206,211 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="container mx-auto p-8">
-      {/* Use the Notification component */}
-      <Notification
-        show={notificationState.show}
-        onClose={closeNotification}
-        message={notificationState.message}
-        type={notificationState.type}
-        icon={notificationState.type === 'success' ? <CheckIcon className="w-5 h-5 text-green-600" /> : undefined}
-      />
+    <DashboardLayout>
+      <div className="p-8">
+        {/* Notification Toast */}
+        <Notification
+          show={notificationState.show}
+          onClose={closeNotification}
+          message={notificationState.message}
+          type={notificationState.type}
+          icon={notificationState.type === 'success' ? <CheckIcon className="w-5 h-5 text-green-600" /> : undefined}
+        />
 
-      <div className="mb-8">
-        <div className="rounded-lg bg-gradient-to-br from-purple-600 via-purple-400 to-amber-300 p-8 text-white">
-          <div className="flex justify-between items-center">
-            <div>
-              <div className="text-sm mb-2">CURRENT PLAN</div>
-              <h1 className="text-3xl font-bold mb-6">Researcher</h1>
-              <div className="space-y-2">
-                <div className="text-sm">API Limit</div>
-                <div className="bg-white/20 rounded-full h-2 w-full">
-                  <div className="bg-white rounded-full h-full" style={{ width: '2.4%' }} />
-                </div>
-                <div className="text-sm">24/1,000 Requests</div>
-              </div>
-            </div>
-            <Button 
-              variant="outline" 
-              className="bg-transparent text-white border-white hover:bg-white/10 transition-colors"
-            >
-              Manage Plan
-            </Button>
+        {/* Header Section with breadcrumbs */}
+        <div className="mb-6">
+          <div className="flex items-center text-sm text-gray-500 mb-2">
+            <span>Pages</span>
+            <span className="mx-2">/</span>
+            <span>Overview</span>
           </div>
+          <h1 className="text-3xl font-bold text-gray-900">Overview</h1>
         </div>
-      </div>
 
-      <div className="bg-white rounded-lg p-6 shadow-sm">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">API Keys</h2>
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">+ Create New API Key</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] bg-white">
-              <DialogHeader>
-                <DialogTitle className="text-xl font-semibold text-gray-900">Create a new API key</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-6 py-4">
+        <div className="mb-8">
+          <div className="rounded-lg bg-gradient-to-br from-purple-600 via-purple-400 to-amber-300 p-8 text-white">
+            <div className="flex justify-between items-center">
+              <div>
+                <div className="text-sm mb-2">CURRENT PLAN</div>
+                <h1 className="text-3xl font-bold mb-6">Researcher</h1>
                 <div className="space-y-2">
-                  <label className="text-sm text-gray-500">
-                    Key Name — A unique name to identify this key
-                  </label>
-                  <Input
-                    id="keyName"
-                    value={newKeyName}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setNewKeyName(e.target.value)}
-                    placeholder="Key Name"
-                    className="w-full bg-gray-900/5 border-0 text-gray-900 placeholder:text-gray-500 focus-visible:ring-1 focus-visible:ring-gray-300"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm text-gray-500">
-                    Limit monthly usage*
-                  </label>
-                  <Input
-                    type="number"
-                    value={monthlyLimit}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setMonthlyLimit(e.target.value)}
-                    placeholder="1000"
-                    className="w-full bg-gray-900/5 border-0 text-gray-900 placeholder:text-gray-500 focus-visible:ring-1 focus-visible:ring-gray-300"
-                  />
-                  <p className="text-xs text-gray-400">
-                    *If the combined usage of all your keys exceeds your plan's limit, all requests will be rejected.
-                  </p>
-                </div>
-                <div className="flex justify-end gap-3">
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsCreateDialogOpen(false)}
-                    className="bg-transparent hover:bg-gray-50 border-gray-200 text-gray-600"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleCreateKey}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    Create
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        <div className="text-sm text-gray-500 mb-4">
-          The key is used to authenticate your requests to the Research API. To learn more, see the <span className="text-gray-900">documentation</span> page.
-        </div>
-
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-gray-500 font-medium">NAME</TableHead>
-              <TableHead className="text-gray-500 font-medium">USAGE</TableHead>
-              <TableHead className="text-gray-500 font-medium">KEY</TableHead>
-              <TableHead className="text-gray-500 font-medium">OPTIONS</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {apiKeys.map((apiKey) => (
-              <TableRow key={apiKey.id} className="border-t border-gray-100">
-                <TableCell className="font-medium text-gray-900">{apiKey.name}</TableCell>
-                <TableCell className="text-gray-500">{apiKey.usage}</TableCell>
-                <TableCell>
-                  <code className="bg-gray-50 px-2 py-1 rounded text-gray-500">
-                    {visibleKeys[apiKey.id] ? apiKey.key : maskApiKey(apiKey.key)}
-                  </code>
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <button 
-                      className={`p-2 hover:bg-gray-50 rounded-md ${visibleKeys[apiKey.id] ? 'text-blue-600' : 'text-gray-400 hover:text-gray-500'}`}
-                      onClick={() => toggleKeyVisibility(apiKey.id)}
-                    >
-                      <EyeIcon className="w-4 h-4" />
-                    </button>
-                    <button 
-                      className={`p-2 hover:bg-gray-50 rounded-md ${copiedKeyId === apiKey.id ? 'text-green-600' : 'text-gray-400 hover:text-gray-500'}`}
-                      onClick={() => handleCopyKey(apiKey.key, apiKey.id)}
-                    >
-                      {copiedKeyId === apiKey.id ? (
-                        <CheckIcon className="w-4 h-4" />
-                      ) : (
-                        <CopyIcon className="w-4 h-4" />
-                      )}
-                    </button>
-                    <button 
-                      className="p-2 hover:bg-gray-50 rounded-md text-gray-400 hover:text-gray-500"
-                      onClick={() => handleEditKey(apiKey)}
-                    >
-                      <EditIcon className="w-4 h-4" />
-                    </button>
-                    <button 
-                      className="p-2 hover:bg-gray-50 rounded-md text-red-400 hover:text-red-500"
-                      onClick={() => handleDeleteKey(apiKey.id)}
-                    >
-                      <TrashIcon className="w-4 h-4" />
-                    </button>
+                  <div className="text-sm">API Limit</div>
+                  <div className="bg-white/20 rounded-full h-2 w-full">
+                    <div className="bg-white rounded-full h-full" style={{ width: '2.4%' }} />
                   </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-
-      {/* Edit Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[425px] bg-white">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-gray-900">Edit API Key</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-6 py-4">
-            <div className="space-y-2">
-              <Input
-                value={editingKey?.name || ''}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => 
-                  setEditingKey(prev => prev ? { ...prev, name: e.target.value } : null)
-                }
-                placeholder="my-cool-api-key"
-                className="w-full bg-gray-900/5 border-0 text-gray-900 placeholder:text-gray-500 focus-visible:ring-1 focus-visible:ring-gray-300"
-              />
-            </div>
-            <div className="flex justify-end gap-3">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setIsEditDialogOpen(false);
-                  setEditingKey(null);
-                }}
-                className="bg-transparent hover:bg-gray-50 border-gray-200 text-gray-600"
+                  <div className="text-sm">24/1,000 Requests</div>
+                </div>
+              </div>
+              <Button 
+                variant="outline" 
+                className="bg-transparent text-white border-white hover:bg-white/10 transition-colors"
               >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleSaveEdit}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                Save
+                Manage Plan
               </Button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
-    </div>
+        </div>
+
+        <div className="bg-white rounded-lg p-6 shadow-sm">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold text-gray-900">API Keys</h2>
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white">+ Create New API Key</Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px] bg-white">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-semibold text-gray-900">Create a new API key</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-6 py-4">
+                  <div className="space-y-2">
+                    <label className="text-sm text-gray-500">
+                      Key Name — A unique name to identify this key
+                    </label>
+                    <Input
+                      id="keyName"
+                      value={newKeyName}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => setNewKeyName(e.target.value)}
+                      placeholder="Key Name"
+                      className="w-full bg-gray-900/5 border-0 text-gray-900 placeholder:text-gray-500 focus-visible:ring-1 focus-visible:ring-gray-300"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm text-gray-500">
+                      Limit monthly usage*
+                    </label>
+                    <Input
+                      type="number"
+                      value={monthlyLimit}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => setMonthlyLimit(e.target.value)}
+                      placeholder="1000"
+                      className="w-full bg-gray-900/5 border-0 text-gray-900 placeholder:text-gray-500 focus-visible:ring-1 focus-visible:ring-gray-300"
+                    />
+                    <p className="text-xs text-gray-400">
+                      *If the combined usage of all your keys exceeds your plan's limit, all requests will be rejected.
+                    </p>
+                  </div>
+                  <div className="flex justify-end gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsCreateDialogOpen(false)}
+                      className="bg-transparent hover:bg-gray-50 border-gray-200 text-gray-600"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleCreateKey}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      Create
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          <div className="text-sm text-gray-500 mb-4">
+            The key is used to authenticate your requests to the Research API. To learn more, see the <span className="text-gray-900">documentation</span> page.
+          </div>
+
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-gray-500 font-medium">NAME</TableHead>
+                <TableHead className="text-gray-500 font-medium">USAGE</TableHead>
+                <TableHead className="text-gray-500 font-medium">KEY</TableHead>
+                <TableHead className="text-gray-500 font-medium">OPTIONS</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {apiKeys.map((apiKey) => (
+                <TableRow key={apiKey.id} className="border-t border-gray-100">
+                  <TableCell className="font-medium text-gray-900">{apiKey.name}</TableCell>
+                  <TableCell className="text-gray-500">{apiKey.usage}</TableCell>
+                  <TableCell>
+                    <code className="bg-gray-50 px-2 py-1 rounded text-gray-500">
+                      {visibleKeys[apiKey.id] ? apiKey.key : maskApiKey(apiKey.key)}
+                    </code>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <button 
+                        className={`p-2 hover:bg-gray-50 rounded-md ${visibleKeys[apiKey.id] ? 'text-blue-600' : 'text-gray-400 hover:text-gray-500'}`}
+                        onClick={() => toggleKeyVisibility(apiKey.id)}
+                      >
+                        <EyeIcon className="w-4 h-4" />
+                      </button>
+                      <button 
+                        className={`p-2 hover:bg-gray-50 rounded-md ${copiedKeyId === apiKey.id ? 'text-green-600' : 'text-gray-400 hover:text-gray-500'}`}
+                        onClick={() => handleCopyKey(apiKey.key, apiKey.id)}
+                      >
+                        {copiedKeyId === apiKey.id ? (
+                          <CheckIcon className="w-4 h-4" />
+                        ) : (
+                          <CopyIcon className="w-4 h-4" />
+                        )}
+                      </button>
+                      <button 
+                        className="p-2 hover:bg-gray-50 rounded-md text-gray-400 hover:text-gray-500"
+                        onClick={() => handleEditKey(apiKey)}
+                      >
+                        <EditIcon className="w-4 h-4" />
+                      </button>
+                      <button 
+                        className="p-2 hover:bg-gray-50 rounded-md text-red-400 hover:text-red-500"
+                        onClick={() => handleDeleteKey(apiKey.id)}
+                      >
+                        <TrashIcon className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Edit Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="sm:max-w-[425px] bg-white">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-semibold text-gray-900">Edit API Key</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-6 py-4">
+              <div className="space-y-2">
+                <Input
+                  value={editingKey?.name || ''}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                    setEditingKey(prev => prev ? { ...prev, name: e.target.value } : null)
+                  }
+                  placeholder="my-cool-api-key"
+                  className="w-full bg-gray-900/5 border-0 text-gray-900 placeholder:text-gray-500 focus-visible:ring-1 focus-visible:ring-gray-300"
+                />
+              </div>
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsEditDialogOpen(false);
+                    setEditingKey(null);
+                  }}
+                  className="bg-transparent hover:bg-gray-50 border-gray-200 text-gray-600"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSaveEdit}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  Save
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </DashboardLayout>
   );
 }
 
