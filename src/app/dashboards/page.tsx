@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { supabase } from '@/lib/supabase';
 import type { DbApiKey } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
+import { Notification } from '@/components/ui/notification';
 
 interface ApiKey extends Omit<DbApiKey, 'created_at'> {
   createdAt: string;
@@ -30,6 +31,11 @@ export default function DashboardPage() {
   const [visibleKeys, setVisibleKeys] = useState<Record<string, boolean>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null);
+  const [notificationState, setNotificationState] = useState({
+    show: false,
+    message: '',
+    type: 'success' as 'success' | 'error' | 'info' | 'warning'
+  });
 
   useEffect(() => {
     fetchApiKeys();
@@ -146,17 +152,41 @@ export default function DashboardPage() {
   const handleCopyKey = (key: string, id: string) => {
     navigator.clipboard.writeText(key).then(() => {
       setCopiedKeyId(id);
+      setNotificationState({
+        show: true,
+        message: 'Copied API Key to clipboard',
+        type: 'success'
+      });
+      
       // Reset the copied state after 2 seconds
       setTimeout(() => {
         setCopiedKeyId(null);
       }, 2000);
     }).catch(err => {
       console.error('Failed to copy: ', err);
+      setNotificationState({
+        show: true,
+        message: 'Failed to copy to clipboard',
+        type: 'error'
+      });
     });
+  };
+
+  const closeNotification = () => {
+    setNotificationState(prev => ({ ...prev, show: false }));
   };
 
   return (
     <div className="container mx-auto p-8">
+      {/* Use the Notification component */}
+      <Notification
+        show={notificationState.show}
+        onClose={closeNotification}
+        message={notificationState.message}
+        type={notificationState.type}
+        icon={notificationState.type === 'success' ? <CheckIcon className="w-5 h-5 text-green-600" /> : undefined}
+      />
+
       <div className="mb-8">
         <div className="rounded-lg bg-gradient-to-br from-purple-600 via-purple-400 to-amber-300 p-8 text-white">
           <div className="flex justify-between items-center">
@@ -370,5 +400,11 @@ function TrashIcon(props: React.SVGProps<SVGSVGElement>) {
 function CheckIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polyline points="20 6 9 17 4 12"/></svg>
+  );
+}
+
+function CloseIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
   );
 } 
