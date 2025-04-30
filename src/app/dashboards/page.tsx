@@ -19,7 +19,8 @@ export default function DashboardPage() {
     createApiKey, 
     updateApiKey, 
     deleteApiKey,
-    closeNotification 
+    closeNotification,
+    showNotification 
   } = useApiKeys();
 
   // UI state
@@ -77,6 +78,7 @@ export default function DashboardPage() {
             apiKeys={apiKeys}
             onEditKey={handleEditKey}
             onDeleteKey={deleteApiKey}
+            showNotification={showNotification}
           />
         </div>
 
