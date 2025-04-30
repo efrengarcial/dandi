@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ApiKey } from '../hooks/useApiKeys';
+import { ApiKey, NotificationState } from '../hooks/useApiKeys';
 import { 
   EyeIcon, 
   CopyIcon, 
@@ -20,9 +20,10 @@ interface ApiKeysTableProps {
   apiKeys: ApiKey[];
   onEditKey: (apiKey: ApiKey) => void;
   onDeleteKey: (id: string) => Promise<boolean>;
+  showNotification: (message: string, type: NotificationState['type']) => void;
 }
 
-export function ApiKeysTable({ apiKeys, onEditKey, onDeleteKey }: ApiKeysTableProps) {
+export function ApiKeysTable({ apiKeys, onEditKey, onDeleteKey, showNotification }: ApiKeysTableProps) {
   const [visibleKeys, setVisibleKeys] = useState<Record<string, boolean>>({});
   const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null);
 
@@ -43,12 +44,16 @@ export function ApiKeysTable({ apiKeys, onEditKey, onDeleteKey }: ApiKeysTablePr
     navigator.clipboard.writeText(key).then(() => {
       setCopiedKeyId(id);
       
+      // Show notification
+      showNotification('Copied API Key to clipboard', 'success');
+      
       // Reset the copied state after 2 seconds
       setTimeout(() => {
         setCopiedKeyId(null);
       }, 2000);
     }).catch(err => {
       console.error('Failed to copy: ', err);
+      showNotification('Failed to copy to clipboard', 'error');
     });
   };
 
