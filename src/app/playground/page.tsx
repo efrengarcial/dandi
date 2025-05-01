@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/ui/sidebar';
 import { Notification } from '@/components/ui/notification';
-import { validateApiKey } from '../actions';
 import { CheckCircleIcon, XCircleIcon } from './icons';
 
 export default function PlaygroundPage() {
@@ -14,6 +13,18 @@ export default function PlaygroundPage() {
   const [showNotification, setShowNotification] = useState(false);
   const router = useRouter();
 
+  const validateApiKey = async (key: string) => {
+    const response = await fetch('/api/validate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ apiKey: key }),
+    });
+    
+    return response.json();
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -22,7 +33,7 @@ export default function PlaygroundPage() {
     setIsValidating(true);
     
     try {
-      // Call the server action to validate the API key
+      // Call the API endpoint to validate the API key
       const result = await validateApiKey(apiKey);
       setValidationResult(result);
       setShowNotification(true);
