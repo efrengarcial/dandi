@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,21 +14,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // This would normally be a database query or API call to validate the key
-    // For now, we'll just check if it starts with 'dandi-' and is longer than 10 characters
-    const isValid = apiKey.startsWith('dandi-') && apiKey.length > 10;
-    
-    if (isValid) {
-      return NextResponse.json({
-        isValid: true,
-        message: "Valid API key, /protected can be accessed"
-      });
-    } else {
-      return NextResponse.json({
-        isValid: false,
-        message: "Invalid API key"
-      });
+    // Validate the API key against Supabase database
+    const { data, error } = await supabase
+      .from('api_keys')
+      .select('*')
+      .eq('key', apiKey)
+      .single();
+
+    if (error) {
+      console.error('Supabase query error:', error);
+      
+      // If the error is "No rows found", it means the API key doesn't exist
+      if (error.code === 'PGRST116') {
+        return NextResponse.json({
+          isValid: false,
+          message: "Invalid API key"
+        });
+      }
+      
+      // For other errors, return a server error
+      return NextResponse.json(
+        { isValid: false, message: "Server error validating API key" },
+        { status: 500 }
+      );
     }
+
+    // API key exists in the database
+    return NextResponse.json({
+      isValid: true,
+      message: "Valid API key, /protected can be accessed",
+      key: data
+    });
+    
   } catch (error) {
     console.error('Error validating API key:', error);
     return NextResponse.json(
