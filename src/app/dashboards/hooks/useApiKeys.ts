@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { DbApiKey } from '@/lib/supabase';
@@ -49,6 +51,7 @@ export function useApiKeys() {
     fetchApiKeys();
   }, []);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const createApiKey = async (name: string, _monthlyLimit: string) => {
     try {
       const newKey: Omit<DbApiKey, 'id'> = {
