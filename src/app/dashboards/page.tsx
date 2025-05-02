@@ -9,12 +9,12 @@ import { ApiKeysTable } from './components/ApiKeysTable';
 import { CreateApiKeyDialog, CreateApiKeyButton } from './components/CreateApiKeyDialog';
 import { EditApiKeyDialog } from './components/EditApiKeyDialog';
 import { PlanOverview } from './components/PlanOverview';
+import { ApiKey } from './hooks/useApiKeys';
 
 export default function DashboardPage() {
   // API key related state and logic
   const { 
     apiKeys, 
-    isLoading, 
     notificationState, 
     createApiKey, 
     updateApiKey, 
@@ -29,7 +29,7 @@ export default function DashboardPage() {
   const [editingKey, setEditingKey] = useState<{ id: string; name: string } | null>(null);
 
   // Handlers
-  const handleEditKey = (apiKey: any) => {
+  const handleEditKey = (apiKey: ApiKey) => {
     setEditingKey({ id: apiKey.id, name: apiKey.name });
     setIsEditDialogOpen(true);
   };

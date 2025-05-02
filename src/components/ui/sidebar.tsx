@@ -1,17 +1,14 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 interface SidebarProps {
   className?: string;
-  collapsed?: boolean;
-  onToggle?: () => void;
 }
 
-export function Sidebar({ className, collapsed = false, onToggle }: SidebarProps) {
+export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname();
   
   const links = [

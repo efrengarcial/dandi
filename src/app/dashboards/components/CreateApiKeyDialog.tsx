@@ -1,7 +1,7 @@
 import { useState, ChangeEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface CreateApiKeyDialogProps {
   isOpen: boolean;
@@ -57,7 +57,7 @@ export function CreateApiKeyDialog({ isOpen, onOpenChange, onCreateKey }: Create
               className="w-full bg-gray-800 border-0 text-white placeholder:text-gray-500 focus-visible:ring-1 focus-visible:ring-gray-600"
             />
             <p className="text-xs text-gray-500">
-              *If the combined usage of all your keys exceeds your plan's limit, all requests will be rejected.
+              *If the combined usage of all your keys exceeds your plan&apos;s limit, all requests will be rejected.
             </p>
           </div>
           <div className="flex justify-end gap-3">

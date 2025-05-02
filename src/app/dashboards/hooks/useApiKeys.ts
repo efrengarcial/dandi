@@ -22,10 +22,6 @@ export function useApiKeys() {
     type: 'success'
   });
 
-  useEffect(() => {
-    fetchApiKeys();
-  }, []);
-
   const fetchApiKeys = async () => {
     try {
       const { data, error } = await supabase
@@ -49,7 +45,11 @@ export function useApiKeys() {
     }
   };
 
-  const createApiKey = async (name: string, monthlyLimit: string) => {
+  useEffect(() => {
+    fetchApiKeys();
+  }, []);
+
+  const createApiKey = async (name: string, _monthlyLimit: string) => {
     try {
       const newKey: Omit<DbApiKey, 'id'> = {
         name,

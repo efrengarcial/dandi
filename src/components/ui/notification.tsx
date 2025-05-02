@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 interface NotificationProps {
@@ -20,12 +20,8 @@ export function Notification({
   duration = 3000,
   icon
 }: NotificationProps) {
-  const [isVisible, setIsVisible] = useState(false);
-
   useEffect(() => {
-    if (show) {
-      setIsVisible(true);
-      
+    if (show) {      
       if (duration > 0) {
         const timer = setTimeout(() => {
           onClose();
